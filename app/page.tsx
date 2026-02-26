@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { 
   Users, 
@@ -12,7 +14,9 @@ import {
   Settings,
   Menu,
   X,
-  User as UserIcon
+  User as UserIcon,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -26,7 +30,7 @@ import {
   IntegrationStatus,
   Role,
   Notification
-} from './types';
+} from '@/src/types';
 import { 
   BarChart, 
   Bar, 
@@ -39,6 +43,8 @@ import {
   Pie,
   Cell
 } from 'recharts';
+import { Toast, ToastType } from '@/components/ui/Toast';
+import { RoleMappingD3 } from '@/components/RoleMappingD3';
 
 // --- Components ---
 
@@ -115,7 +121,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout, isOpen, onClose }: { activ
               <UserIcon size={16} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-red-600 transition-colors">Fabricio Diaz</p>
+              <p className="text-xs font-semibold text-slate-800 truncate group-hover:text-red-600 transition-colors">Emma Hernández</p>
               <p className="text-[10px] text-slate-400 truncate">Administrador</p>
             </div>
             <LogOut size={14} className="text-slate-400 group-hover:text-red-600 transition-colors" />
@@ -168,7 +174,7 @@ const Header = ({ title, onMenuClick }: { title: string, onMenuClick: () => void
                 >
                   <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                     <h4 className="text-sm font-bold text-slate-800">Notificaciones</h4>
-                    <span className="text-[10px] text-tia-red font-bold uppercase tracking-wider">Marcar todas como leídas</span>
+                    <span className="text-[10px] text-tia-red font-bold uppercase tracking-wider cursor-pointer">Marcar todas como leídas</span>
                   </div>
                   <div className="max-h-96 overflow-y-auto">
                     {MOCK_NOTIFICATIONS.map((n) => (
@@ -197,9 +203,9 @@ const Header = ({ title, onMenuClick }: { title: string, onMenuClick: () => void
         <div className="h-8 w-[1px] bg-slate-200 mx-2"></div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-tia-red/10 text-tia-red flex items-center justify-center font-bold text-xs">
-            FD
+            EH
           </div>
-          <span className="text-sm font-medium text-slate-700">Fabricio Diaz</span>
+          <span className="text-sm font-medium text-slate-700">Emma Hernández</span>
         </div>
       </div>
     </header>
@@ -514,7 +520,6 @@ const UsersView = () => {
                 {!selectedUser && (
                   <button 
                     onClick={() => {
-                      alert('Usuario creado exitosamente (Simulado)');
                       setShowModal(false);
                     }}
                     className="px-6 py-2 bg-tia-red text-white text-sm font-bold rounded-lg hover:bg-tia-red-hover transition-colors shadow-lg shadow-tia-red/20"
@@ -613,20 +618,27 @@ const RolesView = ({ showToast }: { showToast: (m: string, t: any) => void }) =>
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-xl border border-slate-200 card-shadow text-center">
-        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <ShieldCheck size={32} className="text-slate-300" />
+      <div className="bg-white p-8 rounded-xl border border-slate-200 card-shadow">
+        <div className="flex flex-col lg:flex-row gap-8 items-center">
+          <div className="flex-1 text-center lg:text-left">
+            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
+              <ShieldCheck size={32} className="text-slate-300" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-800">Visualización de Mapeos (D3.js)</h3>
+            <p className="text-sm text-slate-500 max-w-md mt-2">
+              Grafo interactivo que muestra la relación entre cargos corporativos, sistemas y roles técnicos.
+            </p>
+            <button 
+              onClick={() => setShowMappingModal(true)}
+              className="mt-6 px-6 py-2 border-2 border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:border-tia-red hover:text-tia-red transition-all"
+            >
+              Configurar Mapeos
+            </button>
+          </div>
+          <div className="flex-1 w-full">
+            <RoleMappingD3 />
+          </div>
         </div>
-        <h3 className="text-lg font-bold text-slate-800">Matriz de Cardinalidad</h3>
-        <p className="text-sm text-slate-500 max-w-md mx-auto mt-2">
-          Configura las relaciones 1-1 o 1-N entre cargos corporativos y roles técnicos en Keycloak, SGR y SIM.
-        </p>
-        <button 
-          onClick={() => setShowMappingModal(true)}
-          className="mt-6 px-6 py-2 border-2 border-slate-200 rounded-lg text-sm font-bold text-slate-600 hover:border-tia-red hover:text-tia-red transition-all"
-        >
-          Configurar Mapeos
-        </button>
       </div>
 
       <AnimatePresence>
@@ -734,15 +746,6 @@ const RolesView = ({ showToast }: { showToast: (m: string, t: any) => void }) =>
                             <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full uppercase">Activo</span>
                           </div>
                         ))}
-                        {MOCK_USERS.filter(u => {
-                          const sysKey = viewingUsersForRole.sistema.toLowerCase().split(' ')[0];
-                          const userRoles = (u.sistemas as any)[sysKey] || [];
-                          return userRoles.includes(viewingUsersForRole.nombre);
-                        }).length === 0 && (
-                          <div className="p-12 text-center text-slate-400 text-sm italic">
-                            No hay usuarios asignados directamente a este rol técnico.
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -800,8 +803,166 @@ const RolesView = ({ showToast }: { showToast: (m: string, t: any) => void }) =>
   );
 };
 
+const MonitorView = ({ showToast }: { showToast: (m: string, t: any) => void }) => {
+  const [reprocessing, setReprocessing] = React.useState<string | null>(null);
+
+  const handleReprocess = (id: string) => {
+    setReprocessing(id);
+    setTimeout(() => {
+      setReprocessing(null);
+      showToast('Sincronización re-lanzada con éxito. El bus de eventos está procesando la solicitud.', 'success');
+    }, 2000);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
+          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Activity size={16} className="text-tia-red" />
+            Estado del Event Bus
+          </h4>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-sm font-medium text-slate-600">Operacional</span>
+            </div>
+            <span className="text-xs text-slate-400">Latencia: 45ms</span>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
+          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Activity size={16} className="text-amber-500" />
+            Salud de Colas (SQS)
+          </h4>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-600">3 Colas con retraso</span>
+            <span className="text-xs text-amber-600 font-bold">Atención</span>
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
+          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+            <Activity size={16} className="text-blue-500" />
+            Workers Activos
+          </h4>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-600">24 Instancias</span>
+            <span className="text-xs text-slate-400">CPU: 32%</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+        <div className="p-6 border-b border-slate-100">
+          <h3 className="text-lg font-bold text-slate-800">Integraciones en Tiempo Real</h3>
+          <p className="text-sm text-slate-500">Estado de sincronización entre el Event Bus y los sistemas finales.</p>
+        </div>
+        <div className="divide-y divide-slate-100">
+          {MOCK_INTEGRATIONS.map((integration) => (
+            <div key={integration.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+              <div className="flex items-center gap-4">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  integration.estado === 'Exitoso' ? 'bg-emerald-100 text-emerald-600' : 
+                  integration.estado === 'Fallido' ? 'bg-red-100 text-tia-red' : 'bg-blue-100 text-blue-600'
+                }`}>
+                  {integration.estado === 'Exitoso' ? <CheckCircle size={20} /> : 
+                   integration.estado === 'Fallido' ? <AlertCircle size={20} /> : <Activity size={20} className="animate-spin" />}
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800">{integration.sistema}</h4>
+                  <p className="text-xs text-slate-500">Última sync: {integration.ultimaSincronizacion}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-6">
+                {integration.error && (
+                  <div className="hidden lg:block">
+                    <p className="text-[10px] font-bold text-tia-red uppercase mb-1">Error Detectado</p>
+                    <p className="text-xs text-slate-600 max-w-xs truncate">{integration.error}</p>
+                  </div>
+                )}
+                
+                {integration.reprocesable && (
+                  <button 
+                    onClick={() => handleReprocess(integration.id)}
+                    disabled={reprocessing === integration.id}
+                    className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+                      reprocessing === integration.id 
+                        ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
+                        : 'bg-slate-900 text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    {reprocessing === integration.id ? 'Reprocesando...' : 'Reprocesar Manualmente'}
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AuditView = ({ showToast }: { showToast: (m: string, t: any) => void }) => {
+  const handleExport = () => {
+    showToast('Generando reporte de auditoría en formato CSV/PDF... El archivo se descargará automáticamente en unos segundos.', 'info');
+  };
+
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
+      <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-lg font-bold text-slate-800">Registro de Auditoría</h3>
+          <p className="text-sm text-slate-500">Trazabilidad completa de cambios en identidades y roles.</p>
+        </div>
+        <button 
+          onClick={handleExport}
+          className="text-slate-500 hover:text-tia-red text-sm font-semibold flex items-center justify-center gap-2"
+        >
+          <History size={16} />
+          Exportar Reporte
+        </button>
+      </div>
+    <div className="overflow-x-auto">
+      <table className="w-full text-left border-collapse min-w-[800px]">
+        <thead>
+          <tr className="bg-slate-50 border-b border-slate-100">
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Fecha y Hora</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Usuario Afectado</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Acción</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sistema</th>
+            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Responsable</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          {MOCK_AUDIT.map((entry) => (
+            <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
+              <td className="px-6 py-4 text-xs text-slate-500 font-mono">{entry.fecha}</td>
+              <td className="px-6 py-4 text-sm font-semibold text-slate-800">{entry.usuario}</td>
+              <td className="px-6 py-4">
+                <div className="flex flex-col">
+                  <span className="text-sm text-slate-700 font-medium">{entry.accion}</span>
+                  <span className="text-[10px] text-slate-400 italic">{entry.detalle}</span>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <span className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded uppercase">
+                  {entry.sistema}
+                </span>
+              </td>
+              <td className="px-6 py-4 text-sm text-slate-600 font-medium">{entry.responsable}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  );
+};
+
 const LoginView = ({ onLogin }: { onLogin: () => void }) => {
-  const [email, setEmail] = React.useState('admin@tia.com.ec');
+  const [email, setEmail] = React.useState('emma.hernández@tia.com.ec');
   const [password, setPassword] = React.useState('********');
 
   return (
@@ -864,182 +1025,26 @@ const LoginView = ({ onLogin }: { onLogin: () => void }) => {
   );
 };
 
-const MonitorView = ({ showToast }: { showToast: (m: string, t: any) => void }) => {
-  const [reprocessing, setReprocessing] = React.useState<string | null>(null);
-
-  const handleReprocess = (id: string) => {
-    setReprocessing(id);
-    setTimeout(() => {
-      setReprocessing(null);
-      showToast('Sincronización re-lanzada con éxito. El bus de eventos está procesando la solicitud.', 'success');
-    }, 2000);
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
-          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Activity size={16} className="text-tia-red" />
-            Estado del Event Bus
-          </h4>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-sm font-medium text-slate-600">Operacional</span>
-            </div>
-            <span className="text-xs text-slate-400">Latencia: 45ms</span>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
-          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Activity size={16} className="text-amber-500" />
-            Salud de Colas (SQS)
-          </h4>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-600">3 Colas con retraso</span>
-            <span className="text-xs text-amber-600 font-bold">Atención</span>
-          </div>
-        </div>
-        <div className="bg-white p-6 rounded-xl border border-slate-200 card-shadow">
-          <h4 className="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
-            <Activity size={16} className="text-blue-500" />
-            Lambdas de Procesamiento
-          </h4>
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-600">8/8 Activas</span>
-            <span className="text-xs text-emerald-600 font-bold">OK</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-        <div className="p-6 border-b border-slate-100">
-          <h3 className="text-lg font-bold text-slate-800">Sincronización de Sistemas</h3>
-          <p className="text-sm text-slate-500">Monitoreo en tiempo real de la propagación de identidades.</p>
-        </div>
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {MOCK_INTEGRATIONS.map((item) => (
-            <div key={item.id} className="border border-slate-100 rounded-xl p-4 hover:border-tia-red/20 transition-colors group">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.sistema}</span>
-                <span className={`w-2 h-2 rounded-full ${
-                  item.estado === 'Exitoso' ? 'bg-emerald-500' : item.estado === 'Fallido' ? 'bg-tia-red' : 'bg-blue-500'
-                }`}></span>
-              </div>
-              <p className={`text-sm font-bold ${item.estado === 'Fallido' ? 'text-tia-red' : 'text-slate-800'}`}>
-                {item.estado}
-              </p>
-              <p className="text-[10px] text-slate-400 mt-1">Última: {item.ultimaSincronizacion}</p>
-              {item.error && (
-                <p className="text-[10px] text-tia-red mt-2 bg-red-50 p-2 rounded border border-red-100 italic">
-                  {item.error}
-                </p>
-              )}
-              {item.reprocesable && (
-                <button 
-                  onClick={() => handleReprocess(item.id)}
-                  disabled={reprocessing === item.id}
-                  className={`mt-4 w-full py-2 text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2 ${
-                    reprocessing === item.id ? 'bg-slate-400 cursor-not-allowed' : 'bg-slate-900 hover:bg-slate-800'
-                  }`}
-                >
-                  <Activity size={14} className={reprocessing === item.id ? 'animate-spin' : ''} />
-                  {reprocessing === item.id ? 'Reprocesando...' : 'Reprocesar Manualmente'}
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const AuditView = ({ showToast }: { showToast: (m: string, t: any) => void }) => {
-  const handleExport = () => {
-    showToast('Generando reporte de auditoría en formato CSV/PDF... El archivo se descargará automáticamente en unos segundos.', 'info');
-  };
-
-  return (
-    <div className="bg-white rounded-xl border border-slate-200 card-shadow overflow-hidden">
-      <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-bold text-slate-800">Registro de Auditoría</h3>
-          <p className="text-sm text-slate-500">Trazabilidad completa de cambios en identidades y roles.</p>
-        </div>
-        <button 
-          onClick={handleExport}
-          className="text-slate-500 hover:text-tia-red text-sm font-semibold flex items-center justify-center gap-2"
-        >
-          <History size={16} />
-          Exportar Reporte
-        </button>
-      </div>
-    <div className="overflow-x-auto">
-      <table className="w-full text-left border-collapse min-w-[800px]">
-        <thead>
-          <tr className="bg-slate-50 border-b border-slate-100">
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Fecha y Hora</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Usuario Afectado</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Acción</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sistema</th>
-            <th className="px-6 py-4 text-[11px] font-bold text-slate-400 uppercase tracking-wider">Responsable</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {MOCK_AUDIT.map((entry) => (
-            <tr key={entry.id} className="hover:bg-slate-50/50 transition-colors">
-              <td className="px-6 py-4 text-xs text-slate-500 font-mono">{entry.fecha}</td>
-              <td className="px-6 py-4 text-sm font-semibold text-slate-800">{entry.usuario}</td>
-              <td className="px-6 py-4">
-                <div className="flex flex-col">
-                  <span className="text-sm text-slate-700 font-medium">{entry.accion}</span>
-                  <span className="text-[10px] text-slate-400 italic">{entry.detalle}</span>
-                </div>
-              </td>
-              <td className="px-6 py-4">
-                <span className="px-2 py-1 bg-slate-100 rounded text-[10px] font-bold text-slate-600 uppercase">
-                  {entry.sistema}
-                </span>
-              </td>
-              <td className="px-6 py-4 text-sm text-slate-600">{entry.responsable}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
-};
-
 // --- Main App ---
-
-const Toast = ({ message, type, onClose }: { message: string, type: 'success' | 'info' | 'error', onClose: () => void }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50, scale: 0.9 }}
-    animate={{ opacity: 1, y: 0, scale: 1 }}
-    exit={{ opacity: 0, y: 20, scale: 0.9 }}
-    className="fixed bottom-8 right-8 z-[100] flex items-center gap-3 px-6 py-4 bg-slate-900 text-white rounded-2xl shadow-2xl border border-white/10 min-w-[320px]"
-  >
-    <div className={`w-2 h-2 rounded-full ${type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-tia-red' : 'bg-blue-500'}`}></div>
-    <p className="text-sm font-medium flex-1 leading-tight">{message}</p>
-    <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
-      <X size={16} />
-    </button>
-  </motion.div>
-);
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('dashboard');
-  const [toast, setToast] = React.useState<{ message: string, type: 'success' | 'info' | 'error' } | null>(null);
+  const [toasts, setToasts] = React.useState<{ id: number, message: string, type: ToastType }[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
-  const showToast = (message: string, type: 'success' | 'info' | 'error' = 'info') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 5000);
+  const showToast = (message: string, type: ToastType = 'info') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
   };
+
+  const removeToast = (id: number) => {
+    setToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  if (!isAuthenticated) {
+    return <LoginView onLogin={() => setIsAuthenticated(true)} />;
+  }
 
   const renderContent = () => {
     switch (activeTab) {
@@ -1048,64 +1053,44 @@ export default function App() {
       case 'roles': return <RolesView showToast={showToast} />;
       case 'monitor': return <MonitorView showToast={showToast} />;
       case 'audit': return <AuditView showToast={showToast} />;
-      default: return <div className="p-12 text-center text-slate-400">Módulo en desarrollo...</div>;
+      default: return <DashboardView />;
     }
   };
 
   const getTitle = () => {
     switch (activeTab) {
-      case 'dashboard': return 'Dashboard General';
-      case 'users': return 'Gestión de Usuarios';
+      case 'dashboard': return 'Dashboard de Control';
+      case 'users': return 'Consulta de Colaborador';
       case 'roles': return 'Gobierno de Roles';
-      case 'audit': return 'Auditoría de Cambios';
       case 'monitor': return 'Monitoreo de Integraciones';
-      default: return 'Tía IAM Console';
+      case 'audit': return 'Registro de Auditoría';
+      default: return 'IAM Console';
     }
   };
 
-  if (!isAuthenticated) {
-    return <LoginView onLogin={() => setIsAuthenticated(true)} />;
-  }
-
   return (
-    <div className="flex min-h-screen bg-tia-bg font-sans">
+    <div className="flex min-h-screen bg-slate-50 font-sans">
       <Sidebar 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
-        onLogout={() => setIsAuthenticated(false)}
+        onLogout={() => setIsAuthenticated(false)} 
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
       
       <main className="flex-1 flex flex-col min-w-0">
-        <Header 
-          title={getTitle()} 
-          onMenuClick={() => setIsSidebarOpen(true)}
-        />
+        <Header title={getTitle()} onMenuClick={() => setIsSidebarOpen(true)} />
         
-        <div className="p-4 lg:p-8 flex-1 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-            >
-              {renderContent()}
-            </motion.div>
-          </AnimatePresence>
+        <div className="p-4 lg:p-8 flex-1">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderContent()}
+          </motion.div>
         </div>
-
-        <AnimatePresence>
-          {toast && (
-            <Toast 
-              message={toast.message} 
-              type={toast.type} 
-              onClose={() => setToast(null)} 
-            />
-          )}
-        </AnimatePresence>
 
         <footer className="p-6 text-center border-t border-slate-200 bg-white">
           <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
@@ -1113,6 +1098,17 @@ export default function App() {
           </p>
         </footer>
       </main>
+
+      <AnimatePresence>
+        {toasts.map(toast => (
+          <Toast 
+            key={toast.id} 
+            message={toast.message} 
+            type={toast.type} 
+            onClose={() => removeToast(toast.id)} 
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
