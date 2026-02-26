@@ -624,7 +624,7 @@ const RolesView = ({ showToast }: { showToast: (m: string, t: any) => void }) =>
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto lg:mx-0 mb-4">
               <ShieldCheck size={32} className="text-slate-300" />
             </div>
-            <h3 className="text-lg font-bold text-slate-800">Visualización de Mapeos (D3.js)</h3>
+            <h3 className="text-lg font-bold text-slate-800">Visualización de Mapeos</h3>
             <p className="text-sm text-slate-500 max-w-md mt-2">
               Grafo interactivo que muestra la relación entre cargos corporativos, sistemas y roles técnicos.
             </p>
