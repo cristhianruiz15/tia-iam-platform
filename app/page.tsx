@@ -82,7 +82,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout, isOpen, onClose }: { activ
               T
             </div>
             <div>
-              <h1 className="text-tia-red font-bold text-xl tracking-tight">Tía</h1>
+              <h1 className="text-tia-red font-bold text-xl tracking-tight">TIA</h1>
               <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">IAM Console</p>
             </div>
           </div>
@@ -325,7 +325,7 @@ const UsersView = () => {
         <div className="p-6 border-b border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <h3 className="text-lg font-bold text-slate-800">Gestión de Usuarios</h3>
-            <p className="text-sm text-slate-500">Administra los usuarios registrados en el ecosistema Tía.</p>
+            <p className="text-sm text-slate-500">Administra los usuarios registrados en el ecosistema TIA.</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="relative flex-1 sm:flex-initial">
@@ -962,7 +962,7 @@ const AuditView = ({ showToast }: { showToast: (m: string, t: any) => void }) =>
 };
 
 const LoginView = ({ onLogin }: { onLogin: () => void }) => {
-  const [email, setEmail] = React.useState('emma.hernández@tia.com.ec');
+  const [email, setEmail] = React.useState('emma.hernandez@tia.com.ec');
   const [password, setPassword] = React.useState('********');
 
   return (
@@ -977,7 +977,7 @@ const LoginView = ({ onLogin }: { onLogin: () => void }) => {
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-md">
               <ShieldCheck size={32} />
             </div>
-            <h2 className="text-2xl font-bold tracking-tight">Tía IAM Console</h2>
+            <h2 className="text-2xl font-bold tracking-tight">TIA IAM Platform</h2>
             <p className="text-white/70 text-sm mt-1">Gestión Centralizada de Identidades</p>
           </div>
           
@@ -1018,7 +1018,7 @@ const LoginView = ({ onLogin }: { onLogin: () => void }) => {
         </div>
         
         <p className="text-center mt-8 text-slate-400 text-xs font-medium uppercase tracking-widest">
-          Seguridad Corporativa Tía
+          Seguridad Corporativa TIA
         </p>
       </motion.div>
     </div>
@@ -1064,7 +1064,7 @@ export default function App() {
       case 'roles': return 'Gobierno de Roles';
       case 'monitor': return 'Monitoreo de Integraciones';
       case 'audit': return 'Registro de Auditoría';
-      default: return 'IAM Console';
+      default: return 'IAM Platform';
     }
   };
 
@@ -1094,7 +1094,7 @@ export default function App() {
 
         <footer className="p-6 text-center border-t border-slate-200 bg-white">
           <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">
-            © 2026@ Almacenes Tía S.A. - Plataforma de Automatización IAM
+            © 2026@ Almacenes TIA S.A. - Plataforma de Automatización IAM
           </p>
         </footer>
       </main>

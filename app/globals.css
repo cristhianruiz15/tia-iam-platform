@@ -4,12 +4,15 @@
   --color-tia-red: #E30613;
   --color-tia-red-hover: #C20510;
   --color-tia-bg: #F8F9FA;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    @apply bg-tia-bg text-slate-900 antialiased;
+    background-color: var(--color-tia-bg);
+    color: var(--color-slate-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 

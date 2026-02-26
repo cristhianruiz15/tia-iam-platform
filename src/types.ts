@@ -1,4 +1,3 @@
-import { Type } from "@google/genai";
 
 export interface User {
   id: string;

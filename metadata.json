@@ -1,5 +1,5 @@
 {
-  "name": "Tía IAM Console",
+  "name": "Tía IAM Platform",
   "description": "Consola administrativa centralizada para la gestión de identidades, roles y monitoreo de integraciones entre sistemas (Keycloak, SGR, SIM).",
   "requestFramePermissions": []
 }
