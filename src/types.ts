@@ -225,3 +225,81 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     tipo: 'success'
   }
 ];
+
+export interface Trace {
+  trace_id: string;
+  source_system: string;
+  source_event_id: string;
+  event_type: string;
+  event_version: string;
+  employee_id: string;
+  username: string | null;
+  store_id: string;
+  received_at: string;
+  last_updated_at: string;
+  overall_status: string;
+  completed_at: string | null;
+  reprocess_count: number;
+  expected_targets: string[];
+  completed_targets: string[];
+  failed_targets: string[];
+  pending_targets: string[];
+}
+
+export interface TraceHeader extends Trace {
+  version: number;
+  ttl: number | null;
+}
+
+export interface TraceSummary {
+  attempt_groups_count: number;
+  max_attempt: string;
+  retry_count: string;
+  manual_reprocess_count: string;
+  has_failures: boolean;
+  failed_systems: string[];
+  last_failed_system: string;
+  last_error_code: string;
+  last_error_type: string;
+}
+
+export interface TraceItem {
+  entity_type: string;
+  pk: string;
+  sk: string;
+  timestamp: string;
+  priority: number;
+  attempt_id: string | null;
+  data: any;
+}
+
+export interface AttemptGroup {
+  attempt_id: string;
+  system: string;
+  attempt: string;
+  started_at: string;
+  ended_at: string;
+  final_step_status: string;
+  items: TraceItem[];
+}
+
+export interface TraceDetail {
+  trace_id: string;
+  header: TraceHeader;
+  summary: TraceSummary;
+  attempt_groups: AttemptGroup[];
+  ungrouped_items: any[];
+  raw_count: number;
+}
+
+export interface TraceRawResponse {
+  trace_id: string;
+  count: number;
+  items: TraceItem[];
+}
+
+export interface TracesResponse {
+  items: Trace[];
+  next_token: string | null;
+  count: number;
+}

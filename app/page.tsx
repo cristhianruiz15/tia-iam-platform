@@ -16,7 +16,11 @@ import {
   X,
   User as UserIcon,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Terminal,
+  Eye,
+  FileCode,
+  Search as SearchIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -29,7 +33,11 @@ import {
   AuditEntry, 
   IntegrationStatus,
   Role,
-  Notification
+  Notification,
+  Trace,
+  TraceDetail,
+  TraceRawResponse,
+  TraceItem
 } from '@/src/types';
 import { 
   BarChart, 
@@ -45,6 +53,7 @@ import {
 } from 'recharts';
 import { Toast, ToastType } from '@/components/ui/Toast';
 import { RoleMappingD3 } from '@/components/RoleMappingD3';
+import { TracesView } from '@/components/TracesView';
 
 // --- Components ---
 
@@ -55,6 +64,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout, isOpen, onClose }: { activ
     { id: 'roles', label: 'Gobierno de Roles', icon: ShieldCheck },
     { id: 'audit', label: 'Auditoría', icon: History },
     { id: 'monitor', label: 'Monitoreo de Integraciones', icon: Activity },
+    { id: 'traces', label: 'Trazabilidad de Eventos', icon: Terminal },
   ];
 
   return (
@@ -1053,6 +1063,7 @@ export default function App() {
       case 'roles': return <RolesView showToast={showToast} />;
       case 'monitor': return <MonitorView showToast={showToast} />;
       case 'audit': return <AuditView showToast={showToast} />;
+      case 'traces': return <TracesView />;
       default: return <DashboardView />;
     }
   };
@@ -1064,6 +1075,7 @@ export default function App() {
       case 'roles': return 'Gobierno de Roles';
       case 'monitor': return 'Monitoreo de Integraciones';
       case 'audit': return 'Registro de Auditoría';
+      case 'traces': return 'Trazabilidad de Eventos';
       default: return 'IAM Platform';
     }
   };

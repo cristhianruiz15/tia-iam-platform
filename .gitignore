@@ -1,8 +1,16 @@
 node_modules/
+.next/
+.turbo/
 build/
 dist/
+out/
 coverage/
 .DS_Store
 *.log
 .env*
 !.env.example
+*.db
+*.db-journal
+.vscode/
+.idea/
+*.local
