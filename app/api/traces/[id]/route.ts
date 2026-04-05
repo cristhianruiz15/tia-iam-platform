@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { MOCK_TRACE_DETAIL } from '@/lib/mock-traces-data';
+
+const AWS_BASE_URL = 'https://rr6gt3o7kk.execute-api.us-east-1.amazonaws.com';
 
 export async function GET(
   request: Request,
@@ -7,16 +8,18 @@ export async function GET(
 ) {
   const { id } = await params;
   
-  // Return mock data for all IDs for demo purposes, 
-  // patching the trace_id/header to match the requested ID
-  const response = {
-    ...MOCK_TRACE_DETAIL,
-    trace_id: id,
-    header: {
-      ...MOCK_TRACE_DETAIL.header,
-      trace_id: id
-    }
-  };
+  const url = `${AWS_BASE_URL}/traces/${id}`;
 
-  return NextResponse.json(response);
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const errorData = await res.json();
+        return NextResponse.json(errorData, { status: res.status });
+    }
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error fetching from AWS API:', error);
+    return NextResponse.json({ error: 'Failed to fetch from AWS' }, { status: 500 });
+  }
 }

@@ -1,36 +1,24 @@
 import { NextResponse } from 'next/server';
-import { MOCK_TRACES_LIST } from '@/lib/mock-traces-data';
+
+const AWS_BASE_URL = 'https://rr6gt3o7kk.execute-api.us-east-1.amazonaws.com';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   
-  const hasIndexedFilter = [
-    'trace_id', 
-    'employee_id', 
-    'username', 
-    'source_system', 
-    'overall_status', 
-    'event_type'
-  ].some(filter => searchParams.has(filter));
+  // Forward search params to the AWS API
+  const query = searchParams.toString();
+  const url = `${AWS_BASE_URL}/traces?${query}`;
 
-  if (!hasIndexedFilter) {
-    return NextResponse.json({
-      message: "At least one indexed filter is required: trace_id, employee_id, username, source_system+source_event_id, overall_status, event_type"
-    }, { status: 400 });
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const errorData = await res.json();
+        return NextResponse.json(errorData, { status: res.status });
+    }
+    const data = await res.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Error proxying traces API:', error);
+    return NextResponse.json({ error: 'Failed to fetch from AWS' }, { status: 500 });
   }
-
-  const overallStatus = searchParams.get('overall_status');
-  let filteredItems = MOCK_TRACES_LIST;
-
-  if (overallStatus) {
-    filteredItems = MOCK_TRACES_LIST.filter(trace => trace.overall_status === overallStatus);
-  }
-
-  // Handle other filters if needed, but for now we follow the user example
-  
-  return NextResponse.json({
-    items: filteredItems,
-    next_token: null,
-    count: filteredItems.length
-  });
 }
