@@ -12,8 +12,8 @@ export const MOCK_TRACES_LIST: Trace[] = [
     "store_id": "377",
     "received_at": "2025-04-08T22:41:48.870Z",
     "last_updated_at": "2026-04-02T17:10:31.014Z",
-    "overall_status": "IN_PROGRESS",
-    "completed_at": null,
+    "overall_status": "COMPLETED",
+    "completed_at": "2026-04-03T10:00:00Z",
     "reprocess_count": 0,
     "expected_targets": [
         "ACTIVE_DIRECTORY",
@@ -22,14 +22,13 @@ export const MOCK_TRACES_LIST: Trace[] = [
         "SMTP"
     ],
     "completed_targets": [
-        "ACTIVE_DIRECTORY"
-    ],
-    "failed_targets": [],
-    "pending_targets": [
+        "ACTIVE_DIRECTORY",
         "KEYCLOAK",
         "OID",
         "SMTP"
-    ]
+    ],
+    "failed_targets": [],
+    "pending_targets": []
   },
   {
     "trace_id": "522adbff-4730-5e65-b4b7-bb90ef5cf403",
@@ -42,7 +41,7 @@ export const MOCK_TRACES_LIST: Trace[] = [
     "store_id": "377",
     "received_at": "2025-04-08T22:41:48.870Z",
     "last_updated_at": "2026-04-03T20:26:37.263Z",
-    "overall_status": "IN_PROGRESS",
+    "overall_status": "PARTIAL_SUCCESS",
     "completed_at": null,
     "reprocess_count": 0,
     "expected_targets": [
@@ -51,13 +50,14 @@ export const MOCK_TRACES_LIST: Trace[] = [
         "OID",
         "SMTP"
     ],
-    "completed_targets": [],
+    "completed_targets": [
+        "KEYCLOAK",
+        "OID"
+    ],
     "failed_targets": [
         "ACTIVE_DIRECTORY"
     ],
     "pending_targets": [
-        "KEYCLOAK",
-        "OID",
         "SMTP"
     ]
   },
@@ -102,7 +102,7 @@ export const MOCK_TRACES_LIST: Trace[] = [
     "store_id": "377",
     "received_at": "2025-04-08T22:41:48.870Z",
     "last_updated_at": "2026-04-03T20:13:23.801Z",
-    "overall_status": "IN_PROGRESS",
+    "overall_status": "FAILED",
     "completed_at": null,
     "reprocess_count": 0,
     "expected_targets": [
@@ -132,7 +132,7 @@ export const MOCK_TRACES_LIST: Trace[] = [
     "store_id": "377",
     "received_at": "2025-04-08T22:41:48.870Z",
     "last_updated_at": "2026-04-02T17:09:25.455Z",
-    "overall_status": "IN_PROGRESS",
+    "overall_status": "RECEIVED",
     "completed_at": null,
     "reprocess_count": 0,
     "expected_targets": [
@@ -142,10 +142,9 @@ export const MOCK_TRACES_LIST: Trace[] = [
         "SMTP"
     ],
     "completed_targets": [],
-    "failed_targets": [
-        "ACTIVE_DIRECTORY"
-    ],
+    "failed_targets": [],
     "pending_targets": [
+        "ACTIVE_DIRECTORY",
         "KEYCLOAK",
         "OID",
         "SMTP"

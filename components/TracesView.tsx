@@ -67,9 +67,13 @@ export const TracesView = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'SUCCESS': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
-      case 'FAILED': return 'text-tia-red bg-red-50 border-red-100';
+      case 'RECEIVED': return 'text-blue-600 bg-blue-50 border-blue-100';
       case 'IN_PROGRESS': return 'text-amber-600 bg-amber-50 border-amber-100';
+      case 'COMPLETED': return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'PARTIAL_SUCCESS': return 'text-indigo-600 bg-indigo-50 border-indigo-100';
+      case 'FAILED': return 'text-tia-red bg-red-50 border-red-100';
+      case 'REPROCESSING': return 'text-purple-600 bg-purple-50 border-purple-100';
+      case 'CANCELLED': return 'text-slate-600 bg-slate-50 border-slate-100';
       default: return 'text-slate-600 bg-slate-50 border-slate-100';
     }
   };
@@ -135,9 +139,13 @@ export const TracesView = () => {
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             >
+              <option value="RECEIVED">Recibidos</option>
               <option value="IN_PROGRESS">En Progreso</option>
-              <option value="SUCCESS">Exitosos</option>
+              <option value="COMPLETED">Completados</option>
+              <option value="PARTIAL_SUCCESS">Éxito Parcial</option>
               <option value="FAILED">Fallidos</option>
+              <option value="REPROCESSING">Reprocesando</option>
+              <option value="CANCELLED">Cancelados</option>
             </select>
             <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-slate-400 pointer-events-none" size={16} />
           </div>
